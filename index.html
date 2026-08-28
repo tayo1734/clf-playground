@@ -95,6 +95,10 @@
       }
 .header.header-scrolled {
   background: #fff;
+  border-bottom: 2px solid black;
+}
+      .header-scrolled .menu-link {
+    color: black;
 }
       .logo-mark {
         width: 203px;
@@ -314,6 +318,7 @@
         const heroRect = hero.getBoundingClientRect();
         const pastHero = heroRect.bottom < containerRect.top;
         header.classList.toggle("header-scrolled", pastHero);
+logoImg.src = pastHero ? "logo-dark.svg" : "logo.svg";
 
         if (scrollY <= 10) {
           header.classList.remove("header-hidden");
