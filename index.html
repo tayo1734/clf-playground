@@ -302,6 +302,7 @@
       const heroDonateBtn = document.getElementById("heroDonateBtn");
       const hero = document.getElementById("hero");
       const heroBg = document.getElementById("heroBg");
+      const logoImg = document.querySelector(".logo-mark");
 
       // how much slower the bg moves than the actual scroll (0 = static, 1 = normal speed)
       const PARALLAX_FACTOR = 0.35;
@@ -318,7 +319,9 @@
         const heroRect = hero.getBoundingClientRect();
         const pastHero = heroRect.bottom < containerRect.top;
         header.classList.toggle("header-scrolled", pastHero);
-logoImg.src = pastHero ? "logo-dark.svg" : "logo.svg";
+logoImg.src = pastHero
+  ? "logo-dark.svg"
+  : "https://www.4sitestudios.com/wp-content/uploads/2026/08/logo.svg";
 
         if (scrollY <= 10) {
           header.classList.remove("header-hidden");
