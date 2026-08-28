@@ -93,7 +93,9 @@
       .header.header-hidden {
         transform: translateY(-100%);
       }
-
+.header.header-scrolled {
+  background: #fff;
+}
       .logo-mark {
         width: 203px;
         height: auto;
@@ -214,6 +216,18 @@
 
       .filler.black {
         background: #11110a;
+    color: #5b5b5b;
+    text-align: center;
+    vertical-align: middle;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding-top: 56px;
+    font-weight: 900;
+    font-size: 38px;
+    font-family: "Roboto", sans-serif;
+    font-optical-sizing: auto;
+    font-style: normal;
       }
 
       /* ---------- sticky bottom donate bar ---------- */
@@ -270,7 +284,7 @@
             <button class="btn-donate" id="heroDonateBtn">Donate</button>
           </section>
 
-          <div class="filler black">SCROLL<br>DOWN<br>TO<br>VIEw<br>DONATE<br>BUTOON<br>REVEAL</div>
+          <div class="filler black">SCROLL<br>DOWN<br>TO<br>VIEW<br>DONATE<br>BUTTON<br>REVEAL</div>
         </div>
 
         <div class="donate-bar" id="donateBar">Donate</div>
@@ -299,6 +313,7 @@
         const containerRect = scrollEl.getBoundingClientRect();
         const heroRect = hero.getBoundingClientRect();
         const pastHero = heroRect.bottom < containerRect.top;
+        header.classList.toggle("header-scrolled", pastHero);
 
         if (scrollY <= 10) {
           header.classList.remove("header-hidden");
