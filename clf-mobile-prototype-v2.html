@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CLF — Mobile Prototype</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --red: #960f33;
+        --red-dark: #960f33;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background: #e7e5e0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 16px;
+        font-family: "Roboto", Arial, sans-serif;
+        padding: 40px 20px;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      .frame-label {
+        font-size: 13px;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: #6b6860;
+        font-weight: 700;
+      }
+
+      /* outer bezel — no transform, no overflow clipping needed here */
+      .phone-frame {
+        width: 390px;
+        height: 844px;
+        background: #000;
+        border-radius: 40px;
+        padding: 14px;
+        box-shadow: 0 30px 60px rgba(0, 0, 0, 0.25);
+      }
+
+      /* the actual screen: this single element is BOTH the transform
+                 context (containing block for position:fixed children) AND the
+                 overflow:hidden clip, so fixed children can never escape the frame */
+      .screen {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        border-radius: 28px;
+        overflow: hidden;
+        background: #fff;
+        transform: translateZ(0);
+      }
+
+      .scroll-container {
+        position: absolute;
+        inset: 0;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+      }
+      .scroll-container::-webkit-scrollbar {
+        display: none;
+      }
+
+      /* ---------- header ---------- */
+      .header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 20;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 22px 20px;
+        transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+        background: linear-gradient(180deg, black, #00000087, transparent);
+      }
+      .header.header-hidden {
+        transform: translateY(-100%);
+      }
+
+      .logo-mark {
+        width: 203px;
+        height: auto;
+        display: block;
+      }
+      .menu-link {
+        font-size: 14px;
+        font-weight: 700;
+        color: #fff;
+        letter-spacing: 0.02em;
+        padding-bottom: 3px;
+        border-bottom: 2px solid rgba(255, 255, 255, 0.85);
+      }
+
+      /* ---------- hero ---------- */
+      .hero {
+        position: relative;
+        min-height: calc(100vh - 100px);
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        padding: 0 20px 40px;
+        overflow: hidden; /* clip the oversized parallax layer */
+      }
+
+      /* parallax layer — oversized (130% height, offset -15% top) so it
+         still fully covers the hero at the extremes of its translateY range */
+      .hero-bg {
+        position: absolute;
+        top: -15%;
+        left: 0;
+        width: 100%;
+        height: 130%;
+        background-image: url("https://www.4sitestudios.com/wp-content/uploads/2026/08/background-image.png");
+        background-size: cover;
+        background-position: center;
+        will-change: transform;
+      }
+
+      .hero-overlay {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+          180deg,
+          rgba(8, 10, 8, 0.55) 0%,
+          rgba(8, 10, 8, 0.1) 32%,
+          rgba(6, 8, 6, 0.8) 100%
+        );
+        pointer-events: none;
+      }
+
+      .hero h1,
+      .hero p,
+      .hero .btn-donate {
+        position: relative;
+        z-index: 2;
+      }
+
+      .hero h1 {
+        color: #fff;
+        line-height: 1.15;
+        font-weight: 800;
+        letter-spacing: -0.01em;
+        margin: 0 0 16px;
+        font-family: "Roboto", sans-serif;
+        font-size: 34px;
+        font-style: normal;
+        font-weight: 600;
+        line-height: 100%;
+        letter-spacing: 0.02px;
+      }
+
+      .hero h1 mark {
+        background: #eac87d;
+        color: #3a2408;
+        padding: 0px 2px;
+        border-radius: 0;
+        box-decoration-break: clone;
+        -webkit-box-decoration-break: clone;
+      }
+
+      .hero p {
+        color: rgba(255, 255, 255, 0.92);
+        font-size: 15px;
+        line-height: 1.55;
+        margin: 0 0 20px;
+        font-weight: 400;
+      }
+
+      .btn-donate {
+        display: block;
+        width: 100%;
+        background: var(--red);
+        color: #fff;
+        font-size: 15px;
+        font-weight: 700;
+        border: none;
+        padding: 16px 28px;
+        border-radius: 4px;
+        letter-spacing: 0.01em;
+        cursor: pointer;
+        text-align: center;
+        font-family: Roboto;
+        font-size: 16px;
+        font-style: normal;
+        font-weight: 500;
+        line-height: 140%;
+        letter-spacing: 0.32px;
+      }
+      .btn-donate:active {
+        background: var(--red-dark);
+      }
+
+      /* ---------- scroll filler (solid blocks, no placeholder copy) ---------- */
+      .filler {
+        height: 2420px;
+      }
+
+      .filler.black {
+        background: #11110a;
+      }
+
+      /* ---------- sticky bottom donate bar ---------- */
+      .donate-bar {
+        position: fixed;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 20;
+        background: var(--red);
+        color: #fff;
+        text-align: center;
+        font-size: 16px;
+        font-weight: 700;
+        padding: 20px;
+        letter-spacing: 0.01em;
+        cursor: pointer;
+        transform: translateY(100%);
+        transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+      }
+      .donate-bar.donate-visible {
+        transform: translateY(0);
+      }
+      .donate-bar:active {
+        background: var(--red-dark);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="phone-frame">
+      <div class="screen">
+        <header class="header" id="header">
+          <img
+            class="logo-mark"
+            src="https://www.4sitestudios.com/wp-content/uploads/2026/08/logo.svg"
+            alt="CLF logo"
+          />
+          <span class="menu-link">Menu</span>
+        </header>
+
+        <div class="scroll-container" id="scrollContainer">
+          <section class="hero" id="hero">
+            <div class="hero-bg" id="heroBg"></div>
+            <div class="hero-overlay"></div>
+            <h1>
+              New England's Environment Doesn't Defend Itself.
+              <mark>We do.</mark>
+            </h1>
+            <p>
+              We use the power of the law to drive national environmental
+              progress, hold polluters accountable, and protect all that we love
+              about New England for future generations.
+            </p>
+            <button class="btn-donate" id="heroDonateBtn">Donate</button>
+          </section>
+
+          <div class="filler black"></div>
+        </div>
+
+        <div class="donate-bar" id="donateBar">Donate</div>
+      </div>
+    </div>
+
+    <script>
+      const scrollEl = document.getElementById("scrollContainer");
+      const header = document.getElementById("header");
+      const donateBar = document.getElementById("donateBar");
+      const heroDonateBtn = document.getElementById("heroDonateBtn");
+      const hero = document.getElementById("hero");
+      const heroBg = document.getElementById("heroBg");
+
+      // how much slower the bg moves than the actual scroll (0 = static, 1 = normal speed)
+      const PARALLAX_FACTOR = 0.35;
+
+      let lastScrollY = 0;
+      let ticking = false;
+
+      function update() {
+        const scrollY = scrollEl.scrollTop;
+        const delta = scrollY - lastScrollY;
+        const direction = delta > 0 ? "down" : "up";
+
+        const containerRect = scrollEl.getBoundingClientRect();
+        const heroRect = hero.getBoundingClientRect();
+        const pastHero = heroRect.bottom < containerRect.top;
+
+        if (scrollY <= 10) {
+          header.classList.remove("header-hidden");
+          donateBar.classList.remove("donate-visible");
+        } else if (Math.abs(delta) > 1) {
+          if (direction === "down") {
+            header.classList.add("header-hidden");
+            if (pastHero) {
+              donateBar.classList.add("donate-visible");
+            }
+          } else {
+            header.classList.remove("header-hidden");
+            donateBar.classList.remove("donate-visible");
+          }
+        }
+
+        if (!pastHero) {
+          donateBar.classList.remove("donate-visible");
+        }
+
+        // parallax: only bother translating while the hero is still on screen
+        if (heroRect.bottom > containerRect.top) {
+          const offset = scrollY * PARALLAX_FACTOR;
+          heroBg.style.transform = `translate3d(0, ${offset}px, 0)`;
+        }
+
+        lastScrollY = scrollY;
+        ticking = false;
+      }
+
+      scrollEl.addEventListener(
+        "scroll",
+        () => {
+          if (!ticking) {
+            requestAnimationFrame(update);
+            ticking = true;
+          }
+        },
+        { passive: true },
+      );
+    </script>
+  </body>
+</html>
